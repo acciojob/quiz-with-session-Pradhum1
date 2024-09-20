@@ -1,7 +1,4 @@
-//your JS code here.
-
-// Do not change code below this line
-// This code will just display the questions to the screen
+// Array of quiz questions
 const questions = [
   {
     question: "What is the capital of France?",
@@ -30,27 +27,75 @@ const questions = [
   },
 ];
 
-// Display the quiz questions and choices
+// Render questions to the screen
+const questionsElement = document.getElementById("questions");
+
+// Function to load quiz and display selected answers from session storage
 function renderQuestions() {
   for (let i = 0; i < questions.length; i++) {
     const question = questions[i];
     const questionElement = document.createElement("div");
+
+    // Display the question text
     const questionText = document.createTextNode(question.question);
     questionElement.appendChild(questionText);
+
+    // Create radio buttons for each choice
     for (let j = 0; j < question.choices.length; j++) {
       const choice = question.choices[j];
       const choiceElement = document.createElement("input");
       choiceElement.setAttribute("type", "radio");
       choiceElement.setAttribute("name", `question-${i}`);
       choiceElement.setAttribute("value", choice);
-      if (userAnswers[i] === choice) {
+
+      // Check if the user has already selected this option (from session storage)
+      const storedAnswer = sessionStorage.getItem(`question-${i}`);
+      if (storedAnswer === choice) {
         choiceElement.setAttribute("checked", true);
       }
+
+      // Display the choice text next to the radio button
       const choiceText = document.createTextNode(choice);
       questionElement.appendChild(choiceElement);
       questionElement.appendChild(choiceText);
     }
+
     questionsElement.appendChild(questionElement);
   }
 }
-renderQuestions();
+
+// Save user's selected answers in session storage
+function saveProgress() {
+  const inputs = document.querySelectorAll("input[type=radio]:checked");
+  inputs.forEach((input) => {
+    const name = input.getAttribute("name");
+    const value = input.getAttribute("value");
+    sessionStorage.setItem(name, value);
+  });
+}
+
+// Calculate the user's score
+function submitQuiz() {
+  saveProgress(); // Ensure all selections are saved
+  let score = 0;
+
+  for (let i = 0; i < questions.length; i++) {
+    const storedAnswer = sessionStorage.getItem(`question-${i}`);
+    if (storedAnswer === questions[i].answer) {
+      score++;
+    }
+  }
+
+  // Display the score on the page
+  const resultElement = document.getElementById("result");
+  resultElement.innerText = `Your score is ${score} out of 5.`;
+
+  // Store the score in localStorage
+  localStorage.setItem("score", score);
+}
+
+// Attach event listeners
+document.body.addEventListener("change", saveProgress);
+
+// Load the quiz when the page loads
+window.onload = renderQuestions;
