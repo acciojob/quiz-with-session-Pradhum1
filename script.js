@@ -1,4 +1,7 @@
 // Array of quiz questions
+const submitButton = document.getElementById("submit");
+submitButton.addEventListener("click", submitQuiz);
+
 const questions = [
   {
     question: "What is the capital of France?",
